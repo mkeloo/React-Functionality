@@ -172,6 +172,7 @@ button:hover {
   outline: none;
 }
 
+/* Search form */
 .searchForm {
   width: 100%;
   display: flex;

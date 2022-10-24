@@ -1,21 +1,26 @@
 import Header from './components/Header';
+import SearchItem from './components/SearchItem';
 import AddItem from './components/AddItem';
 import Content from './components/Content';
 import Footer from './components/Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
+  const API_URL = 'http://localhost:3001/items';
+
+  // State
   const [items, setItems] = useState(
-    JSON.parse(localStorage.getItem('Shopping List'))
+    JSON.parse(localStorage.getItem('Shopping List')) || []
   );
-
   const [newItem, setNewItem] = useState('');
+  const [search, setSearch] = useState('');
 
-  const setAndSaveItems = (newItems) => {
-    setItems(newItems);
-    localStorage.setItem('Shopping List', JSON.stringify(newItems));
-  };
+  // useEffect
+  useEffect(() => {
+    localStorage.setItem('Shopping List', JSON.stringify(items));
+  }, [items]);
 
+  // Methods
   const addItem = (item) => {
     // Create a new item object id
     const id = items.length ? items[items.length - 1].id + 1 : 1;
@@ -24,19 +29,19 @@ function App() {
     // Add the new item to the items array using the spread operator
     const listItems = [...items, myNewItem];
     // Set the items array to the new listItems array
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleCheck = (id) => {
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleDelete = (id) => {
     const listItems = items.filter((item) => item.id !== id);
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleSubmit = (e) => {
@@ -58,8 +63,11 @@ function App() {
         setNewItem={setNewItem}
         handleSubmit={handleSubmit}
       />
+      <SearchItem search={search} setSearch={setSearch} />
       <Content
-        items={items}
+        items={items.filter((item) =>
+          item.item.toLowerCase().includes(search.toLowerCase())
+        )}
         handleCheck={handleCheck}
         handleDelete={handleDelete}
       />
